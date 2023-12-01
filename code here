@@ -1,0 +1,212 @@
+from tkinter import *
+from tkinter import messagebox
+import mysql.connector
+from PIL import ImageTk,Image
+
+def login():                            #getting username and password from user to login
+    user=username.get()
+    pswrd=password.get()
+    database(user,pswrd)
+
+#python-sql connectivity
+def database(u,p):
+    if p=='a' and u!='':
+        global con
+        global cur
+        con=mysql.connector.connect(host='localhost',user='root',password='123456',db='clg')
+        cur=con.cursor()
+        messagebox.showinfo("Login successful","Logged in")
+        cur.execute("CREATE TABLE IF NOT EXISTS Student_Details(SRN INT NOT NULL PRIMARY KEY,SNAME VARCHAR(30),COURSE VARCHAR(30),YEAR_OF_ADMISSION INT(4) NOT NULL,CONTACT INT(10) NOT NULL,EMAIL VARCHAR(30) NOT NULL)")
+        cur.execute("CREATE TABLE IF NOT EXISTS Mid_Sem(SRN INT NOT NULL REFERENCES Student_Details(SRN),YEAR INT(4) NOT NULL,SUB1 FLOAT(4,1),SUB2 FLOAT(4,1),SUB3 FLOAT(4,1),SUB4 FLOAT(4,1),SUB5 FLOAT(4,1),TOTAL INT,PERCENTAGE FLOAT(4,1),PRIMARY KEY(SRN,YEAR))")
+        cur.execute("CREATE TABLE IF NOT EXISTS End_Sem(SRN INT NOT NULL REFERENCES Student_Details(SRN),YEAR INT(4) NOT NULL,SUB1 FLOAT(4,1),SUB2 FLOAT(4,1),SUB3 FLOAT(4,1),SUB4 FLOAT(4,1),SUB5 FLOAT(4,1),TOTAL INT,PERCENTAGE FLOAT(4,1),PRIMARY KEY(SRN,YEAR))")
+        quitwindow()
+        window2()
+
+    elif p=='':
+        messagebox.showerror("error","Password required")
+    elif u=='':
+        messagebox.showerror("error","Username required")
+    else:
+        messagebox.showerror("error","Incorrect password")
+
+def quitwindow():
+    window.withdraw()
+
+
+def window2():
+    global win2
+    win2=Tk()
+    win2.geometry("400x400+0+0")
+    win2.resizable(False,False)
+    win2.title("Menu")
+    win2.configure(bg='#33A1C9')
+    c=Canvas(win2,width=600,height=600,bg='#33A1C9')
+    c.pack(side=LEFT)
+    title=Label(win2,text='Student Records',fg='black',bg='#33A1C9',font='Times 30')
+    title.place(x=70,y=5)
+
+    button1=Button(win2,text='Student Details',fg='black',bg='lightblue1',font=('Times New Roman',14),command=choice1)
+    button1.place(x=120,y=70,width=150,height=30)
+    
+    button2=Button(win2,text='Examinations',fg='black',bg='lightblue1',font=('Times New Roman',14),command=choice2)
+    button2.place(x=120,y=170,width=150,height=30)
+
+    button3=Button(win2,text='LogOut',fg='black',bg='cornsilk',font=('Times New Roman',14),command=logout)
+    button3.place(x=120,y=270,width=150,height=50)
+
+def logout():
+    win2.withdraw()
+    window.deiconify()
+    
+
+def choice1():
+    global student
+    student=Tk()
+    student.configure(bg='#33A1C9')
+    student.geometry("700x630+0+0")
+    student.title('Student Details')
+    student.resizable(False,False)
+    stu_menu()
+
+def stu_menu():
+    button1=Button(student,text='Add Student',fg='black',bg='lightblue1',font=('Times New Roman',14),command=add)  #add()
+    button1.place(x=100,y=50,width=300,height=30)
+    button2=Button(student,text='Modify Student',fg='black',bg='lightblue1',font=('Times New Roman',14),command=modify)  #modify()
+    button2.place(x=100,y=150,width=300,height=30)
+    button3=Button(student,text='Delete Student',fg='black',bg='lightblue1',font=('Times New Roman',14),command=delete)  #delete()
+    button3.place(x=100,y=250,width=300,height=30)
+    button4=Button(student,text='Search Student',fg='black',bg='lightblue1',font=('Times New Roman',14),command=search)  #search()
+    button4.place(x=100,y=350,width=300,height=30)
+    button5=Button(student,text='View All',fg='black',bg='lightblue1',font=('Times New Roman',14),command=view)  #view()
+    button5.place(x=100,y=450,width=300,height=30)
+
+def add():
+    pass
+def modify():
+    pass
+def delete():
+    pass
+def search():
+    pass
+def view():
+    pass
+
+def choice2():
+    global exam
+    win2.withdraw()
+    exam=Tk()
+    exam.geometry("400x400+0+0")
+    exam.title('Examinations')
+    exam.resizable(False,False)
+    exam.configure(bg='#33A1C9')
+    backhome=Button(exam,text='Back to Home Page',fg='black',bg='pink',font=('Times New Roman',14),command=home)
+    backhome.place(x=100,y=230,width=200,height=30)
+    exam_menu()
+    #put a back to homepage button here
+def home():
+    exam.withdraw()
+    win2.deiconify()
+def exam_menu():
+    button1=Button(exam,text='Mid Sem',fg='black',bg='lightblue1',font=('Times New Roman',14),command=midsem)
+    button1.place(x=100,y=70,width=200,height=30)
+    button2=Button(exam,text='End Sem',fg='black',bg='lightblue1',font=('Times New Roman',14),command=endsem)
+    button2.place(x=100,y=140,width=200,height=30)
+
+def midsem():
+    exam.withdraw()
+    global midsemw
+    midsemw=Tk()
+    midsemw.geometry("700x630+0+0")
+    midsemw.title('Examinations')
+    midsemw.configure(bg='#33A1C9')
+    midsemw.resizable(False,False)
+    button1=Button(midsemw,text='Add Scores',fg='black',bg='lightblue1',font=('Times New Roman',14),command=midadd)
+    button1.place(x=100,y=150,width=300,height=30)
+    button2=Button(midsemw,text='View Scores',fg='black',bg='lightblue1',font=('Times New Roman',14),command=midview)
+    button2.place(x=100,y=250,width=300,height=30)
+    button3=Button(midsemw,text='Delete Scores',fg='black',bg='lightblue1',font=('Times New Roman',14),command=middel)
+    button3.place(x=100,y=350,width=300,height=30)
+    button4=Button(midsemw,text='Modify Scores',fg='black',bg='lightblue1',font=('Times New Roman',14),command=midmodify)
+    button4.place(x=100,y=450,width=300,height=30)
+    button5=Button(midsemw,text='Average',fg='black',bg='lightblue1',font=('Times New Roman',14),command=midaverage)
+    button5.place(x=100,y=550,width=300,height=30)
+    backhome=Button(midsemw,text='Back to Home Page',fg='black',bg='pink',font=('Times New Roman',14),command=homemid)
+    backhome.place(x=450,y=550,width=170,height=30)
+def homemid():
+    midsemw.withdraw()
+    win2.deiconify()
+def midadd():
+    pass
+def midview():
+    pass
+def middel():
+    pass
+def midmodify():
+    pass
+def midaverage():
+    pass
+
+
+def endsem():
+    exam.withdraw()
+    global endsemw
+    endsemw=Tk()
+    endsemw.geometry("700x630+0+0")
+    endsemw.title('Examinations')
+    endsemw.configure(bg='#33A1C9')
+    endsemw.resizable(False,False)
+    button1=Button(endsemw,text='Add Scores',fg='black',bg='lightblue1',font=('Times New Roman',14),command=endadd)
+    button1.place(x=100,y=150,width=300,height=30)
+    button2=Button(endsemw,text='View Scores',fg='black',bg='lightblue1',font=('Times New Roman',14),command=endview)
+    button2.place(x=100,y=250,width=300,height=30)
+    button3=Button(endsemw,text='Delete Scores',fg='black',bg='lightblue1',font=('Times New Roman',14),command=enddel)
+    button3.place(x=100,y=350,width=300,height=30)
+    button4=Button(endsemw,text='Modify Scores',fg='black',bg='lightblue1',font=('Times New Roman',14),command=endmodify)
+    button4.place(x=100,y=450,width=300,height=30)
+    button5=Button(endsemw,text='Average',fg='black',bg='lightblue1',font=('Times New Roman',14),command=endaverage)
+    button5.place(x=100,y=550,width=300,height=30)
+    backhome=Button(endsemw,text='Back to Home Page',fg='black',bg='pink',font=('Times New Roman',14),command=homeend)
+    backhome.place(x=450,y=550,width=170,height=30)
+def homeend():
+    endsemw.withdraw()
+    win2.deiconify()
+def endadd():
+    import endsem1
+def endview():
+    pass
+def enddel():
+    import endsem2
+def endmodify():
+    pass
+def endaverage():
+    pass
+
+
+#-----------------------------------------------------login window----------------------------------------------------------------------
+window=Tk()
+window.geometry("500x500+0+0")
+window.title('Login Page')
+window.resizable(False,False)
+img=Image.open("imagebg.jpg")
+r=img.resize((500,500))
+im=ImageTk.PhotoImage(r)
+label2=Label(image=im,bd=0)
+label2.pack()
+
+
+username=Entry(window,width=500)
+username.place(x=200,y=390,width=100)
+l1=Label(window,text="   Username   ")
+l1.place(x=110,y=390)
+
+
+password=Entry(window,show='*',width=500)
+password.place(x=200,y=420,width=100)
+l2=Label(window,text="   Password   ")
+l2.place(x=110,y=420)
+
+submit=Button(window,text='Login',bg='lightblue',command=login)
+submit.place(x=150,y=450,width=100)
+
+
+window.mainloop()
