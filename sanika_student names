@@ -1,0 +1,275 @@
+from tkinter import *
+from tkinter import messagebox
+import mysql.connector
+import re
+global end
+global year_entry
+
+#regex for email validation
+regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b' ##the format ssn@gm.com
+
+
+con=mysql.connector.connect(host='localhost',user='root',password='mysqL123!',db='college')
+cur=con.cursor()
+def winadd():#to open add record 
+    global srnentry
+    global end
+    global ok1 #next button
+
+    #srn name course yoa contat email ,, remove try except for name course mail contact
+    
+    end=Tk()
+    
+    end.geometry("500x450+0+0")
+    end.resizable(False,False)
+    end.configure(bg='SkyBlue3')
+    srn=Label(end,text='SRN',fg='black',bg='SkyBlue3',font='Times 14')
+    srn.place(x=87,y=10)
+    info=Label(end,text='(Student Registration Number)',fg='black',bg='SkyBlue3',font='Times 12')
+    info.place(x=20,y=30)
+    colon=Label(end,text=':',fg='black',bg='SkyBlue3',font='Times 15')
+    colon.place(x=220,y=10)
+    srnentry=Entry(end,width=20)#entry = function 
+    srnentry.place(x=250,y=10)
+    ok1=Button(end,text='Next',bg='bisque2',fg='black',command=getsrn)
+    ok1.place(x=400,y=10)
+    back=Button(end,text='Back to Menu',fg='black',bg='sienna2',font=('Times New Roman',14),command=endremove)
+    back.place(x=190,y=400)
+
+def endremove(): #back to menu , close window
+    end.withdraw()
+
+unique=[]
+
+''''two recors of same srn , res = tuples srn with year'''
+''''combo of srn year '''
+
+
+
+q="SELECT SRN,YEAR FROM END_SEM"
+cur.execute(q)
+res=cur.fetchall()
+for i in res:
+    unique.append(i)
+srns=[]
+q="SELECT SRN FROM END_SEM"
+cur.execute(q)
+res=cur.fetchall()
+for i in res:
+    for j in i:
+        srns.append(j)
+
+
+
+data=[]
+def getsrn():
+    global end #window name 
+    global srnentry 
+    global yearentry,entry1
+    global ok1,ok2
+    entry1=srnentry.get()
+    try:
+        if entry1!='':
+            if entry1.isdigit():
+                data.append(entry1)
+                srnentry.config(state='disabled')
+                '''ok1['state']=DISABLED'''
+                ok1.destroy()
+                year=Label(end,text='Year of Admission',fg='black',bg='SkyBlue3',font='Times 14')
+                year.place(x=47,y=50)
+                colon=Label(end,text=':',fg='black',bg='SkyBlue3',font='Times 15')
+                colon.place(x=220,y=50)
+                yearentry=Entry(end,width=20)
+                yearentry.place(x=250,y=50)
+                ok2=Button(end,text='Next',bg='bisque2',fg='black',command=getyoa)
+                ok2.place(x=400,y=50)
+            elif entry1.isalpha():
+                messagebox.showerror('Error','Enter Integer Value of length x')
+            else:
+                messagebox.showerror('Error','Enter Integer Value')
+        else:
+            messagebox.showerror('Error','Empty fields not allowed')
+    except ValueError:
+        messagebox.showerror('Error','Enter Integer Value')
+
+def getyoa():
+    
+    global yearentry,sub1entry,entry2
+    global end
+    global ok2,ok3
+    entry2=yearentry.get()
+    try:
+        if entry2!='':
+            if entry2.isdigit() and len(entry2)==4:
+                if (int(entry1),int(entry2)) not in unique: #srn,year combo unique
+                    data.append(entry2)
+                    yearentry.config(state='disabled')
+                    # This ensures that the user cannot modify the year value after it has been submitted.
+                    ok2.destroy()
+                    name=Label(end,text='Student Name',fg='black',bg='SkyBlue3',font='Times 14')
+                    name.place(x=65,y=90)
+                    colon=Label(end,text=':',fg='black',bg='SkyBlue3',font='Times 15')
+                    colon.place(x=220,y=90)
+                    sub1entry=Entry(end,width=20)
+                    sub1entry.place(x=250,y=90)
+                    
+                    ok3=Button(end,text='Next',bg='bisque2',fg='black',command=getname)
+                    ok3.place(x=400,y=90)
+                else:
+                    messagebox.showerror('Error','Record Exists')
+                    end.withdraw()
+                    winadd()
+            elif entry2.isalpha():
+                messagebox.showerror('Error','Enter Integer Value')
+            else:
+                messagebox.showerror('Error','Enter Integer Value')
+        else:
+            messagebox.showerror('Error','Empty fields not allowed')
+    except ValueError:
+        messagebox.showerror('Error','Enter Integer Value')
+
+def getname():
+    global sub1entry,COURSEentry
+    global end,ok3,ok4
+    entry3=sub1entry.get()
+    try:
+        
+        if entry3!='':
+                if entry3.isalpha():
+                    data.append(entry3)
+                    sub1entry.config(state='disabled')
+                    ok3.destroy()
+                    
+                    COURSEentry = Label(end,text='Course Name',fg='black',bg='SkyBlue3',font='Times 14')
+                    COURSEentry.place(x=65,y=130)
+
+                    colon = Label(end,text=':',fg='black',bg='SkyBlue3',font='Times 15')
+                    colon.place(x=220,y=130)
+                    COURSEentry=Entry(end,width=20)
+                    COURSEentry.place(x=250,y=130)
+                    ok4=Button(end,text='Next',bg='bisque2',fg='black',command=getCourse)
+                    ok4.place(x=400,y=130)
+                elif entry3.isdigit():
+                    
+                    messagebox.showerror('Error','Enter Valid Name')
+                else:
+                    messagebox.showerror('Error','Enter Valid Name')
+        else:
+            messagebox.showerror('Error','Empty fields not allowed')
+    except ValueError:
+            messagebox.showerror('Error','Enter Valid Name')
+                
+def getCourse():
+    global end,COURSEentry,emailentry,ok4,ok5
+    entry4=COURSEentry.get()
+    try:
+        if entry4!='':
+            if entry4.isalpha():
+                data.append(entry4)
+                COURSEentry.config(state='disabled')
+                ok4.destroy()
+
+                email = Label(end,text='Email ',fg='black',bg='SkyBlue3',font='Times 14')
+                email.place(x=87,y=170)
+                colon = Label(end,text=':',fg='black',bg='SkyBlue3',font='Times 15')
+                colon.place(x=220,y=170)
+                emailentry=Entry(end,width=20)
+                emailentry.place(x=250,y=170)
+
+                ok5 = Button(end,text='Next',bg='bisque2',fg='black',command=getMail)
+                ok5.place(x=400,y=170)
+            elif entry4.isdigit():
+                messagebox.showerror('Error','Enter Course Name')
+            else:
+                messagebox.showerror('Error','Enter Course Name')
+        else:
+            messagebox.showerror('Error','Empty fields not allowed')
+    except ValueError:
+        messagebox.showerror('Error','Enter Course Name')
+
+def getMail():##validation needs to be checked!
+    global end,emailentry,contactentry,ok5,ok6
+    entry5=emailentry.get()
+    try:
+        if entry5!='':
+            
+            if (re.fullmatch(regex, entry5)):
+                #and '@' in entry5:
+                
+                data.append(entry5)
+                emailentry.config(state='disabled')
+                ok5.destroy()
+               
+                #spacing ??
+
+                contact = Label(end,text='Contact Number',fg='black',bg='SkyBlue3',font='Times 14')
+                contact.place(x=49,y=210)
+                colon = Label(end,text=':',fg='black',bg='SkyBlue3',font='Times 15')
+                colon.place(x=220,y=210)
+                contactentry=Entry(end,width=20)
+                contactentry.place(x=250,y=210)
+
+                ok6=Button(end,text='Next',bg='bisque2',fg='black',command=getNum)
+                ok6.place(x=400,y=210)
+            #elif entry5.isdigit():###NEEDS TO BE CHECKED!
+                #messagebox.showerror('Error','Enter ')
+            else:
+                messagebox.showerror('Error','Invalid Email Address')
+        else:
+            messagebox.showerror('Error','Empty fields not allowed')
+    except ValueError:
+        messagebox.showerror('Error','Invalid Email Address')
+
+def getNum():
+    global end,contactentry,ok6
+    entry6=contactentry.get()
+    try:
+        if entry6!='':
+            
+            if entry6.isdigit() and len(entry6)==10:
+                data.append(entry6)
+                contactentry.config(state='disabled')
+                ok6.destroy()
+                button=Button(end,text='Add Details',bg='LemonChiffon2',fg='black',command=Details)
+                button.place(x=190,y=350)
+
+            elif entry6.isalpha():
+                messagebox.showerror('Error','Enter Integer Value')
+            else:
+                messagebox.showerror('Error','Enter Integer Value')
+        else:
+            
+            messagebox.showerror('Error','Empty fields not allowed')
+    except ValueError:
+        
+        messagebox.showerror('Error','Enter Integer Value')
+
+def Details():
+    '''tlist=data[1:6]
+    deets=[]
+    for i in tlist:
+        j=i
+        deets.append(j)
+    data.append(deets)'''
+    print(data)
+    q="INSERT INTO Student_details VALUES(%s,%s,%s,%s,%s,%s)"
+    v=tuple(data)
+    cur.execute(q,v)
+    con.commit()
+    messagebox.showinfo("Details","Details entered")
+    continue1()
+
+def continue1():
+    again=Button(end,text='Add another Record',bg='pink',fg='black',command=resize1)
+    again.place(x=190,y=150)
+def resize1():
+    end.withdraw()
+    winadd()
+    
+                
+                
+                
+    
+    
+
+winadd()  
